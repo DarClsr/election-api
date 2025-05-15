@@ -14,7 +14,8 @@
 
 ## 部署
 
-## 执行 docker compose up --build 
+## 执行 docker compose up --build -d 后台构建运行
+## 执行 docker compose up -d 直接启动
 
 ## 后台管理界面   http://localhost:5353
 ## 服务端api   http://localhost:8888/api
