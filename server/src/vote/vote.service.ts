@@ -19,8 +19,10 @@ export class VoteService {
 
   async create(userId: string, dto: CreateVoteDto) {
     const { electionId, candidateIds } = dto;
+   
     const election = await this.electionService.findById(electionId);
 
+    
     if (!election) {
       throw new NotFoundException("选举不存在");
     }
@@ -56,10 +58,16 @@ export class VoteService {
       throw new BadRequestException("您已经投过票了");
     }
 
+    console.log({
+      user: userId,
+      election: electionId,
+      candidates: candidateIds,
+    });
+
     const vote = await this.voteModel.create({
       user: userId,
       election: electionId,
-      candidateIds: candidateIds,
+      candidates: candidateIds,
     });
 
     return vote;
@@ -68,6 +76,9 @@ export class VoteService {
   async getVoteCount(electionId: string) {
     const result = await this.voteModel.aggregate([
       { $match: { election: new Types.ObjectId(electionId) } },
+      {
+        $unwind:  "$candidates",
+      },
       {
         $group: {
           _id: "$candidate",

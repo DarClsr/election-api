@@ -170,7 +170,7 @@
                         const code = params.get("code");
                         if (!code) {
                             return Toastify({
-                                text: '非法参数',
+                                text: '非法参数：选举code码错误',
                                 duration: 3000
                             }).showToast();
                         }
@@ -221,6 +221,10 @@
                             headers: { Authorization: `Bearer ${token.value}` },
                         });
                         voted.value = true;
+                         Toastify({
+                            text: '投票成功',
+                            duration: 3000
+                        }).showToast();
                     } catch (err) {
                         Toastify({
                             text: '投票失败: ' + err.response?.data?.message || err.message,

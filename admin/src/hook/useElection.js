@@ -5,6 +5,7 @@ import {
   updateElection,
   removeElection,
   setElectionStatus,
+  getElectionResults,
 } from "../api/election";
 import { Message, Modal } from "@arco-design/web-vue";
 
@@ -66,7 +67,7 @@ export const useElection = () => {
       dataIndex: "actions",
       slotName: "actions",
       fixed: "right",
-      width: 250,
+      width: 300,
     },
   ]);
 
@@ -136,6 +137,18 @@ export const useElection = () => {
     form.value = { ...row };
   };
 
+  const results = ref({});
+  const showResults=ref(false)
+  const getProgress = async (row) => {
+    showResults.value=true;
+    const { data } = await getElectionResults(row._id);
+    results.value = data;
+  };
+
+  const closeReuslt = () => {
+    showResults.value = false;
+  };
+
   const deleteElection = async (row) => {
     await Modal.warning({
       title: "是否执行此项操作",
@@ -164,5 +177,9 @@ export const useElection = () => {
     deleteElection,
     editElection,
     changeStatus,
+    getProgress,
+    results,
+    closeReuslt,
+    showResults
   };
 };

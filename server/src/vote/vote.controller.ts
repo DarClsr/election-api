@@ -26,10 +26,5 @@ export class VoteController {
   async vote(@Body(new ValidationPipe()) dto: CreateVoteDto, @Req() req) {
     return this.voteService.create(req.user._id, dto);
   }
-  @ApiOperation({ summary: "投票结果" })
-  @Roles("admin")
-  @Get("results/:electionId")
-  async getResults(@Param("electionId") electionId: string) {
-    return this.voteService.getVoteCount(electionId);
-  }
+ 
 }

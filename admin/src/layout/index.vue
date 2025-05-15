@@ -38,8 +38,7 @@
 </template>
 
 <script setup>
-import Menu from "@/components/Menu.vue";
-import { IconMoonFill, IconSunFill } from "@arco-design/web-vue/es/icon";
+import Menu from "@/components/menu.vue";
 import { computed, onMounted, provide } from "vue";
 import { useUserStore } from "@/store";
 import { useRouter } from "vue-router";

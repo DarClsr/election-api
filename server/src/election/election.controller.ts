@@ -21,12 +21,15 @@ import { ActiveElectionDto } from "./dto/active-election.dto";
 import { CurrentUser } from "src/auth/user.decorator";
 import { query } from "express";
 import { UpdateElectionDto } from "./dto/update-election.dto";
+import { VoteService } from "src/vote/vote.service";
 
 @ApiTags("选举")
 @Controller("elections")
 @UseGuards(AuthGuard("jwt"), RolesGuard)
 export class ElectionController {
-  constructor(private readonly electionService: ElectionService) {}
+  constructor(
+    private readonly electionService: ElectionService,
+  ) {}
 
   @ApiOperation({ summary: "创建选举" })
   @Post()
@@ -52,7 +55,10 @@ export class ElectionController {
   @ApiOperation({ summary: "修改选举" })
   @Put(":id")
   @Roles("admin")
-  update(@Param("id") id: string, @Body(new ValidationPipe()) body:UpdateElectionDto) {
+  update(
+    @Param("id") id: string,
+    @Body(new ValidationPipe()) body: UpdateElectionDto
+  ) {
     return this.electionService.update(id, body);
   }
   @ApiOperation({ summary: "删除选举" })
@@ -70,5 +76,12 @@ export class ElectionController {
     @Body(new ValidationPipe()) body: ActiveElectionDto
   ) {
     return await this.electionService.active(id, body.status);
+  }
+
+  @ApiOperation({ summary: "投票结果" })
+  @Roles("admin")
+  @Get(":electionId/results")
+  async getResults(@Param("electionId") electionId: string) {
+    return this.electionService.getResults(electionId);
   }
 }

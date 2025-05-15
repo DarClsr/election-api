@@ -15,10 +15,14 @@ import { ConfigModule } from "@nestjs/config";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
 import { RedisModule } from "./redis/redis.module";
+import { VoteModule } from "./vote/vote.module";
+import { ElectionService } from "./election/election.service";
 
 @Module({
   imports: [
     ConfigModule.forRoot({
+      envFilePath:
+        process.env.NODE_ENV === "production" ? ".env.production" : ".env",
       isGlobal: true,
     }),
     DbModule,
@@ -36,8 +40,9 @@ import { RedisModule } from "./redis/redis.module";
     UsersModule,
     CandidatesModule,
     ElectionModule,
+    VoteModule
   ],
-  controllers: [AppController, VoteController],
-  providers: [AppService, VoteService],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

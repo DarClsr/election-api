@@ -9,16 +9,19 @@ import { ReturnModelType } from "@typegoose/typegoose";
 import { Election } from "src/db/models/election.model";
 import { CreateElectionDto } from "./dto/create-election.dto";
 import { UpdateElectionDto } from "./dto/update-election.dto";
-import { title } from "process";
-import { start } from "repl";
 import * as dayjs from "dayjs";
 import { generateRandomStr } from "src/utils";
+import { VoteService } from "src/vote/vote.service";
+import { Vote } from "src/db/models/vote.model";
+import { Types } from "mongoose";
 
 @Injectable()
 export class ElectionService {
   constructor(
     @InjectModel(Election)
-    private readonly electionModel: ReturnModelType<typeof Election>
+    private readonly electionModel: ReturnModelType<typeof Election>,
+    @InjectModel(Vote)
+    private readonly voteModel: ReturnModelType<typeof Election>
   ) {}
 
   create(data: CreateElectionDto, user) {
@@ -68,7 +71,9 @@ export class ElectionService {
   }
 
   async findOne(code: string) {
-    return this.electionModel.findOne({ short_link:code }).populate("candidates");
+    return this.electionModel
+      .findOne({ short_link: code })
+      .populate("candidates");
   }
 
   async update(id: string, data: UpdateElectionDto) {
@@ -115,5 +120,60 @@ export class ElectionService {
       },
     });
     return election.save();
+  }
+
+  async getResults(electionId: string) {
+    const election = await this.electionModel.findById(electionId);
+    if (!election) {
+      throw new NotFoundException("选举活动不存在");
+    }
+    const result = await this.voteModel.aggregate([
+      { $match: { election: new Types.ObjectId(electionId) } },
+      { $unwind: "$candidates" },
+      {
+        $facet: {
+          stats: [
+            {
+              $group: {
+                _id: "$candidates",
+                votes: { $sum: 1 },
+              },
+            },
+            {
+              $lookup: {
+                from: "candidates",
+                localField: "_id",
+                foreignField: "_id",
+                as: "candidate",
+              },
+            },
+            {
+              $unwind: {
+                path: "$candidate",
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+            {
+              $project: {
+                _id: 1,
+                name: "$candidate.name",
+                votes: 1,
+              },
+            },
+            { $sort: { votes: -1 } },
+          ],
+          total: [{ $group: { _id: null, total: { $sum: 1 } } }],
+        },
+      },
+    ]);
+    return {
+      list: result[0].stats.map((v) => {
+        return {
+          ...v,
+          percentage: (v.votes / result[0].total[0].total) * 100,
+        };
+      }),
+      total: result[0]?.total[0]?.total ?? 0,
+    };
   }
 }

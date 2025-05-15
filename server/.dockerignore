@@ -1,0 +1,4 @@
+# .dockerignore（正确示例）
+node_modules
+dist
+.vscode

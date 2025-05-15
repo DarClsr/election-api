@@ -1,8 +1,9 @@
-import { prop, Ref } from '@typegoose/typegoose';
-import { User } from './user.model';
-import { Election } from './election.model';
-import { Candidate } from './candidate.model';
+import { Index, prop, Ref } from "@typegoose/typegoose";
+import { User } from "./user.model";
+import { Election } from "./election.model";
+import { Candidate } from "./candidate.model";
 
+@Index({ election: 1 })
 export class Vote {
   @prop({ ref: () => User, required: true })
   user: Ref<User>;
@@ -11,5 +12,5 @@ export class Vote {
   election: Ref<Election>;
 
   @prop({ ref: () => Candidate, required: true })
-  candidates: Ref<Candidate>[]; 
+  candidates: Ref<Candidate>[];
 }

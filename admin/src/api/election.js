@@ -24,3 +24,7 @@ export const removeElection = (id) => {
 export const setElectionStatus = (id, status) => {
   return http.patch(`/elections/${id}/status`, { status });
 };
+
+export const getElectionResults = (electionId) => {
+  return http.get(`/elections/${electionId}/results`);
+};

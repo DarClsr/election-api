@@ -37,7 +37,7 @@ http.interceptors.response.use(
   function (error) {
     const data = error.response?.data;
 
-    if (data && data.statusCode === 401) {
+    if (data && data.code === 401) {
       Message.error("登录失效，请重新登录");
       setItem("token", "");
       const userStore = useUserStore();
