@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户注册与投票</title>
+    <script src="./assets/js/vue.js"></script>
+    <script src="./assets/js/axios.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./assets/css/toastify.min.css">
+    <link href="./assets/css/tailwindcss.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="./assets/js/toastify.js"></script>
+    <script type="text/javascript" src="./assets/js/tailwindcss.js"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+
+    <div id="app" class="w-full max-w-md p-6 bg-white rounded shadow bg-red">
+        <!-- 登录/注册切换 -->
+        <div class="mb-4 text-center" v-if="!token">
+            <button @click="mode = 'login'" :class="mode === 'login' ? 'font-bold underline' : 'text-gray-500'"
+                class="mr-4">登录</button>
+            <button @click="mode = 'register'"
+                :class="mode === 'register' ? 'font-bold underline' : 'text-gray-500'">注册</button>
+        </div>
+
+        <!-- 注册表单 -->
+        <div v-if="mode === 'register' && !token">
+            <h2 class="text-xl font-bold mb-4">用户注册</h2>
+            <input v-model="registerEmail" type="email" placeholder="邮箱" class="w-full p-2 border rounded mb-2">
+            <div class="flex gap-2 mb-2">
+                <input v-model="registerCode" placeholder="验证码" class="flex-1 p-2 border rounded">
+                <button @click="sendRegisterCode" class="bg-blue-500 text-white px-4 py-2 rounded">发送验证码</button>
+            </div>
+            <input v-model="registerPassword" type="password" placeholder="设置密码" class="w-full p-2 border rounded mb-2">
+            <button @click="register" class="bg-green-500 text-white w-full py-2 rounded">注册</button>
+        </div>
+
+        <!-- 登录表单 -->
+        <div v-if="mode === 'login' && !token">
+            <h2 class="text-xl font-bold mb-4">用户登录</h2>
+            <input v-model="loginEmail" type="email" placeholder="邮箱" class="w-full p-2 border rounded mb-2">
+            <input v-model="loginPassword" type="password" placeholder="密码" class="w-full p-2 border rounded mb-2">
+            <button @click="login" class="bg-blue-600 text-white w-full py-2 rounded">登录</button>
+        </div>
+
+        <!-- 投票区 -->
+        <div v-if="token" class="w-full h-full">
+            <h2 class="text-xl font-bold mb-4">候选人投票</h2>
+            <div v-if="election.candidates.length === 0">加载候选人中...</div>
+            <div v-for="c in election.candidates" :key="c._id" class="mb-2">
+                <label class="flex items-center space-x-2">
+                    <input type="checkbox" :value="c._id" v-model="selected" :disabled="voted" />
+                    <span>{{ c.name }}</span>
+                </label>
+            </div>
+            <div class="w-full flex justify-center" v-if="election.candidates.length">
+                <button type="submit" class="bg-blue-600 text-white w-[100px] py-2 rounded mt-2" @click="submitVote">
+                    提交投票
+                </button>
+            </div>
+            <p v-if="voted" class="mt-2 text-green-600">投票成功！</p>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, watch, onMounted } = Vue;
+
+        createApp({
+            setup() {
+                const mode = ref('login'); // 'login' or 'register'
+                const token = ref(localStorage.getItem("token"));
+                const election = ref({
+                    title: "",
+                    description: "",
+                    candidates: []
+                })
+                const selected = ref([]);
+                const voted = ref(false);
+
+                axios.interceptors.response.use(
+                    function (response) {
+                        return response;
+                    },
+                    function (error) {
+                        const data = error.response?.data;
+                        console.log(data,'axios')
+                        if (data && data.code === 401) {
+                            localStorage.setItem("token", "");
+                            token.value=""
+                        } 
+
+                        return Promise.reject(error);
+                    }
+                );
+
+                // 登录数据
+                const loginEmail = ref('');
+                const loginPassword = ref('');
+
+                // 注册数据
+                const registerEmail = ref('');
+                const registerCode = ref('');
+                const registerPassword = ref('');
+
+                onMounted(async () => {
+                    if (token.value) {
+                        loadCandidates()
+                    }
+                });
+
+                const sendRegisterCode = async () => {
+                    try {
+                        await axios.get('/api/auth/code', {
+                            params: {
+                                email: registerEmail.value
+                            }
+                        });
+                        Toastify({
+                            text: '验证码已发送',
+                            duration: 3000
+                        }).showToast();
+                    } catch (err) {
+                        Toastify({
+                            text: '发送失败: ' + err.response?.data?.message || err.message,
+                            duration: 3000
+                        }).showToast();
+                    }
+                };
+
+                const register = async () => {
+                    try {
+                        const { data } = await axios.post('/api/auth/register', {
+                            email: registerEmail.value,
+                            code: registerCode.value,
+                            password: registerPassword.value,
+                        });
+                        alert('注册成功，请切换到登录');
+                        mode.value = 'login';
+                        token.value = data.data.token;
+                        localStorage.setItem('token', data.data.token);
+
+                    } catch (err) {
+                        alert('注册失败: ' + err.response?.data?.message || err.message);
+                    }
+                };
+
+                const login = async () => {
+                    try {
+                        const { data } = await axios.post('/api/auth/login', {
+                            email: loginEmail.value,
+                            password: loginPassword.value,
+                        });
+                        token.value = data.data.token;
+                        localStorage.setItem('token', data.data.token);
+                        loadCandidates();
+                    } catch (err) {
+                        console.log(err)
+                        Toastify({
+                            text: '登录失败: ' + err.response?.data?.message || err.message,
+                            duration: 3000
+                        }).showToast();
+                    }
+                };
+
+                const loadCandidates = async () => {
+                    try {
+
+                        const params = new URLSearchParams(window.location.search);
+                        const code = params.get("code");
+                        if (!code) {
+                            return Toastify({
+                                text: '非法参数',
+                                duration: 3000
+                            }).showToast();
+                        }
+                        const { data } = await axios.get('/api/elections/' + code, {
+                            headers: { Authorization: `Bearer ${token.value}` },
+                        });
+
+                        if (data.code === 0) {
+                            election.value = data.data;
+                            limitSelection();
+                        }
+
+
+                    } catch (err) {
+                        Toastify({
+                            text: '加载候选人失败:' + err.response?.data?.message || err.message,
+                            duration: 3000
+                        }).showToast();
+                    }
+                };
+
+                const limitSelection = () => {
+                    const maxVotes = () => Math.max(2, Math.floor(election.value.candidates.length * 0.2));
+                    watch(selected, (val) => {
+                        if (val.length > maxVotes()) {
+                            Toastify({
+                                text: `最多只能投 ${maxVotes()} 票`,
+                                duration: 3000
+                            }).showToast();
+                            selected.value.pop();
+                        }
+                    });
+                };
+
+                const submitVote = async () => {
+                    // if(selected.value.length<2){
+                    //     return Toastify({
+                    //         text: '不能少于两人',
+                    //         duration: 3000
+                    //     }).showToast();
+                    // }
+
+                    try {
+                        await axios.post('/api/vote', {
+                            candidateIds: selected.value,
+                            electionId: election.value._id
+                        }, {
+                            headers: { Authorization: `Bearer ${token.value}` },
+                        });
+                        voted.value = true;
+                    } catch (err) {
+                        Toastify({
+                            text: '投票失败: ' + err.response?.data?.message || err.message,
+                            duration: 3000
+                        }).showToast();
+                    }
+                };
+
+                return {
+                    mode,
+                    token,
+                    election,
+                    selected,
+                    voted,
+                    loginEmail,
+                    loginPassword,
+                    registerEmail,
+                    registerCode,
+                    registerPassword,
+                    sendRegisterCode,
+                    register,
+                    login,
+                    submitVote,
+                };
+            },
+        }).mount('#app');
+    </script>
+
+</body>
+
+</html>
