@@ -5,7 +5,7 @@
 
 ## 技术栈
 - 前端：Vue.js + Vite
-- 后端：Nest.js
+- 后端：Nest.js 
 - 数据库：mongodb
 - 部署：Docker + Nginx
 
@@ -32,7 +32,6 @@
 - 投票前台
   - 选举码验证
   - 投票界面
-  - 实时结果展示
 
 ## 开发指南
 
@@ -83,6 +82,11 @@ npm run start:dev
 ## 数据库
 
 ### vote-system
+
+## 测试
+
+## npm run test 测试所有文件
+## npm run vote.service 测试单个文件
 
 
 
