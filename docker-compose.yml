@@ -11,6 +11,8 @@ services:
       - backend
     networks:
       - app-network
+    environment:
+      - NODE_ENV=production
 
   backend:
     build:

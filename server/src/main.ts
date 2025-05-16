@@ -1,8 +1,8 @@
-import { NestFactory } from "@nestjs/core";
-import { AppModule } from "./app.module";
-import { HttpExceptionFilter } from "./common/http-exception.filter";
-import { ResponseInterceptor } from "./common/response.interceptor";
-import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import { HttpExceptionFilter } from './common/http-exception.filter';
+import { ResponseInterceptor } from './common/response.interceptor';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -24,13 +24,13 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
 
-  app.setGlobalPrefix("api");
+  app.setGlobalPrefix('api');
 
-  const PORT = process.env.PORT || 3000;
+  const PORT = process.env.PORT || 8888;
 
-  await app.listen(PORT);
+  await app.listen(PORT, '0.0.0.0');
   console.log(`* Running on http://127.0.0.1:${PORT}`);
   console.log(`* Running on http://127.0.0.1:${PORT}/docs`);
-  console.log("* 启动成功");
+  console.log('* 启动成功');
 }
 bootstrap();

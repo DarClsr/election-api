@@ -27,7 +27,7 @@ import { VoteModule } from './vote/vote.module';
       signOptions: { expiresIn: '7d' },
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '../../', 'public'), // 指向静态文件根目录
+      rootPath: join(__dirname, '../', 'public'), // 指向静态文件根目录
     }),
     RedisModule,
     AuthModule,

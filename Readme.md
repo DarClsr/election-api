@@ -6,7 +6,7 @@
 ## 技术栈
 - 前端：Vue.js + Vite
 - 后端：Nest.js
-- 数据库：待补充
+- 数据库：mongodb
 - 部署：Docker + Nginx
 
 ## 项目结构
