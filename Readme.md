@@ -84,9 +84,8 @@ npm run start:dev
 ### vote-system
 
 ## 测试
-
-## npm run test 测试所有文件
-## npm run vote.service 测试单个文件
+ - npm run test 测试所有文件
+ - npm run vote.service 测试单个文件
 
 
 
