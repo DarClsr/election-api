@@ -1,6 +1,6 @@
-import { Global, Module } from "@nestjs/common";
-import { RedisService } from "./redis.service";
-import { RedisModule as IoRedisModule } from "@nestjs-modules/ioredis";
+import { Global, Module } from '@nestjs/common';
+import { RedisService } from './redis.service';
+import { RedisModule as IoRedisModule } from '@nestjs-modules/ioredis';
 
 @Global()
 @Module({
@@ -9,12 +9,12 @@ import { RedisModule as IoRedisModule } from "@nestjs-modules/ioredis";
       useFactory: () => {
         return {
           url: process.env.REDIS_URL,
-          type: "single",
+          type: 'single',
         };
       },
     }),
   ],
   providers: [RedisService],
-  exports:[RedisService]
+  exports: [RedisService],
 })
 export class RedisModule {}

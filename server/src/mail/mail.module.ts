@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { MailerModule } from '@nestjs-modules/mailer';
+import { MailerModule, MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config'; // 引入配置服务
 import { MailService } from './mail.service';
 
@@ -21,6 +21,7 @@ import { MailService } from './mail.service';
           from: `"投票吧！" <${config.get('EMAIL_USER')}>`,
         },
       }),
+      extraProviders:[MailerService]
     }),
   ],
   providers: [MailService],

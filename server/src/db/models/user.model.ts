@@ -1,6 +1,6 @@
 import { modelOptions, prop } from "@typegoose/typegoose";
 import { genSaltSync, hashSync } from "bcryptjs";
-import { get, trim } from "lodash";
+import { trim } from "lodash";
 
 export enum Role {
   admin = "admin",

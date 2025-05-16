@@ -160,6 +160,8 @@ import { ref, onMounted } from "vue";
 import { Message } from "@arco-design/web-vue";
 import { useElection } from "../../hook/useElection";
 import { useCandidate } from "../../hook/useCandidate";
+import { getConfig } from '@/config';
+
 const {
   list,
   isNew,
@@ -207,7 +209,8 @@ const getMessage = (errors) => {
 const { options, getOptions } = useCandidate();
 
 const openElection = (record) => {
-  window.open(`http://127.0.0.1:8888/index.html?code=${record.short_link}`);
+  const port = import.meta.env.MODE === 'development' ? '8889' : '8888';
+  window.open(`http://127.0.0.1:${port}/index.html?code=${record.short_link}`);
 };
 
 onMounted(() => {

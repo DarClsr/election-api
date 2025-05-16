@@ -5,10 +5,8 @@ import { MailModule } from 'src/mail/mail.module';
 import { JwtStrategy } from './jwt.strategy';
 
 @Module({
-  imports:[
-    MailModule
-  ],
-  providers: [AuthService,JwtStrategy],
+  imports: [MailModule],
+  providers: [AuthService, JwtStrategy],
   controllers: [AuthController],
 })
 export class AuthModule {}
