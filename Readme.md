@@ -80,6 +80,10 @@ npm run start:dev
 3. API文档支持在线调试
 4. 为了方便测试 env文件就提了上去 （实际是不能的）
 
+## 数据库
+
+### vote-system
+
 
 
 
