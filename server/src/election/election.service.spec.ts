@@ -72,7 +72,7 @@ describe('ElectionService', () => {
         title: 'Test Election',
         description: 'Test Description',
         candidates: ['candidate1', 'candidate2'],
-        times: ['2025-05-16T08:34:21.537Z', '2025-05-16T09:34:21.537Z'],
+        times: ['2025-05-16T08:34:21.537Z', '2025-05-31T09:34:21.537Z'],
       };
 
       const user = { _id: 'user123' };
