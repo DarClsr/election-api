@@ -16,7 +16,7 @@ describe('ElectionService', () => {
   beforeEach(async () => {
     consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
     jest.useFakeTimers();
-    
+
     mockElectionModel = {
       create: jest.fn(),
       find: jest.fn().mockReturnThis(),
@@ -59,7 +59,7 @@ describe('ElectionService', () => {
     jest.useRealTimers();
     consoleSpy.mockRestore();
     await module.close();
-    await new Promise(resolve => setTimeout(resolve, 100)); // 等待所有异步操作完成
+    await new Promise((resolve) => setTimeout(resolve, 100)); // 等待所有异步操作完成
   });
 
   it('should be defined', () => {
